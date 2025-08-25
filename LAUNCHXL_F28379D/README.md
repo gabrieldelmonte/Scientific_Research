@@ -25,8 +25,8 @@ This project implements a unified control system for a buck converter using the 
   - Setpoint potentiometer (ADC channel A2)
   - Input voltage monitoring (ADC channel B2)
   - PWM-controlled MOSFET driver (EPWM1A output)
-- **DS3231 RTC Module** (I2C interface on GPIO104/105)
-- **UART Interface** (GPIO18/19, 9600 baud) for data communication
+- **DS3231 RTC Module** (I2C interface on GPIO40/41)
+- **UART Interface** (GPIO56/139, 9600 baud) for data communication
 - **Control Buttons**: Start (GPIO67) and Stop (GPIO111)
 - **Status LEDs**: GPIO31 and GPIO34
 
@@ -372,7 +372,7 @@ ConfigCpuTimer(&CpuTimer0, 100, 50);  // 50ms period
    - Monitor communication task LED (GPIO34)
 
 5. **I2C/RTC Problems**:
-   - Check DS3231 module connections: GPIO104 (SDA), GPIO105 (SCL)
+   - Check DS3231 module connections: GPIO40 (SDA), GPIO41 (SCL)
    - Verify pull-up resistors on I2C lines, if not defined on GPIO104 and GPIO105
    - Monitor `i2c_status` variable for error codes
    - Check 3.3V power supply to DS3231

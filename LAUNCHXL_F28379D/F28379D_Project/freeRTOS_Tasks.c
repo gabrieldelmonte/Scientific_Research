@@ -84,8 +84,9 @@ void communication_task(void *pvParameters) {
         ServiceDog();
 
         if (system_state) {
-            int decimal_part;
             GpioDataRegs.GPBCLEAR.bit.GPIO34 = 1;
+
+            int decimal_part;
 
             uart_send_int(setpoint_filter.setpoint);
             decimal_part = (setpoint_filter.setpoint - (int)setpoint_filter.setpoint) * 10;
@@ -139,6 +140,7 @@ void communication_task(void *pvParameters) {
  */
 void control_task(void *pvParameters) {
     float controller_output = 0.0f;
+    char reset_flag = 1;
 
     vTaskDelay(TASK2_STARTUP_DELAY / portTICK_PERIOD_MS);
 
@@ -148,6 +150,8 @@ void control_task(void *pvParameters) {
 
         if (system_state) {
             GpioDataRegs.GPACLEAR.bit.GPIO31 = 1;
+
+            reset_flag = 1;
 
             if (setpoint_filter.setpoint < (0.975f * input_monitor.voltage)) {
                 controller_output = controller_compute(
@@ -166,7 +170,11 @@ void control_task(void *pvParameters) {
             }
         }
         else {
-            controller_reset();
+            if (reset_flag) {
+                controller_reset();
+                reset_flag = 0;
+            }
+
             duty_cycle = 0.0f;
         }
 
@@ -212,7 +220,7 @@ void freeRTOS_Setup(void) {
         "ControlTask",
         STACK_SIZE, 
         (void *)NULL,
-        tskIDLE_PRIORITY + 3,
+        tskIDLE_PRIORITY + 4,
         control_task_stack,
         &control_task_buffer
     );

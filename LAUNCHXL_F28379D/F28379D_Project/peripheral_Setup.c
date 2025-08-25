@@ -176,18 +176,24 @@ void dac_init(void) {
 void uart_init(void) {
     EALLOW;
 
-        // Configure GPIO18 as SCITX_B
-        GpioCtrlRegs.GPAGMUX2.bit.GPIO18 = 0;
-        GpioCtrlRegs.GPAMUX2.bit.GPIO18 = 2;
-        GpioCtrlRegs.GPAPUD.bit.GPIO18 = 1;
-        GpioCtrlRegs.GPADIR.bit.GPIO18 = 1;
+        // Disable SCI_C peripheral clock
+        CpuSysRegs.PCLKCR7.bit.SCI_C = 0;
 
-        // Configure GPIO19 as SCIRX_B
-        GpioCtrlRegs.GPAGMUX2.bit.GPIO19 = 0;
-        GpioCtrlRegs.GPAMUX2.bit.GPIO19 = 2;
-        GpioCtrlRegs.GPAPUD.bit.GPIO19 = 0;
-        GpioCtrlRegs.GPADIR.bit.GPIO19 = 0;
-        GpioCtrlRegs.GPAQSEL2.bit.GPIO19 = 3;
+        // Configure GPIO56 as SCITX_C
+        GpioCtrlRegs.GPBGMUX2.bit.GPIO56 = 1;
+        GpioCtrlRegs.GPBMUX2.bit.GPIO56 = 2;
+        GpioCtrlRegs.GPBPUD.bit.GPIO56 = 1;
+        GpioCtrlRegs.GPBDIR.bit.GPIO56 = 1;
+
+        // Configure GPIO139 as SCIRX_C
+        GpioCtrlRegs.GPEGMUX1.bit.GPIO139 = 1;
+        GpioCtrlRegs.GPEMUX1.bit.GPIO139 = 2;
+        GpioCtrlRegs.GPEPUD.bit.GPIO139 = 0;
+        GpioCtrlRegs.GPEDIR.bit.GPIO139 = 0;
+        GpioCtrlRegs.GPEQSEL1.bit.GPIO139 = 3;
+
+        // Enable SCI_C peripheral clock
+        CpuSysRegs.PCLKCR7.bit.SCI_C = 1;
 
     EDIS;
 
@@ -200,26 +206,26 @@ void uart_init(void) {
     // enable TX/RX
     // Internal SCICLK
     // Disable RX ERR, SLEEP, TXWAKE
-    ScibRegs.SCICCR.all = 0x0007;
-    ScibRegs.SCICTL1.all = 0x0003;
-    ScibRegs.SCICTL2.all = 0x0003;
-    ScibRegs.SCICTL2.bit.TXINTENA = 0;
-    ScibRegs.SCICTL2.bit.RXBKINTENA = 0;
+    ScicRegs.SCICCR.all = 0x0007;
+    ScicRegs.SCICTL1.all = 0x0003;
+    ScicRegs.SCICTL2.all = 0x0003;
+    ScicRegs.SCICTL2.bit.TXINTENA = 0;
+    ScicRegs.SCICTL2.bit.RXBKINTENA = 0;
 
-    // SCIB at 9600 baud
+    // SCIC at 9600 baud
     // @LSPCLK = 50 MHz (200 MHz SYSCLK) HBAUD = 0x02 and LBAUD = 0x8B.
-    ScibRegs.SCIHBAUD.all = 0x02;
-    ScibRegs.SCILBAUD.all = 0x8B;
+    ScicRegs.SCIHBAUD.all = 0x02;
+    ScicRegs.SCILBAUD.all = 0x8B;
 
     // Initialize the SCI FIFO
-    ScibRegs.SCIFFTX.all = 0xC022;
-    ScibRegs.SCIFFRX.all = 0x0028;
-    ScibRegs.SCIFFCT.all = 0x0000;
+    ScicRegs.SCIFFTX.all = 0xC022;
+    ScicRegs.SCIFFRX.all = 0x0028;
+    ScicRegs.SCIFFCT.all = 0x0000;
 
     // Relinquish SCI from Reset
-    ScibRegs.SCICTL1.all = 0x0023;
-    ScibRegs.SCIFFTX.bit.TXFIFORESET = 1;
-    ScibRegs.SCIFFRX.bit.RXFIFORESET = 1;
+    ScicRegs.SCICTL1.all = 0x0023;
+    ScicRegs.SCIFFTX.bit.TXFIFORESET = 1;
+    ScicRegs.SCIFFRX.bit.RXFIFORESET = 1;
 
     return;
 }
@@ -237,45 +243,48 @@ void spi_init(void) {
 void i2c_init(void) {
     EALLOW;
 
-        // Configure GPIO104 as SDA_A
-        GpioCtrlRegs.GPDGMUX1.bit.GPIO104 = 0;
-        GpioCtrlRegs.GPDMUX1.bit.GPIO104 = 1;
+        // Disable I2C_B peripheral clock
+        CpuSysRegs.PCLKCR9.bit.I2C_B = 0;
 
-        // Configure GPIO105 SCL_A
-        GpioCtrlRegs.GPDGMUX1.bit.GPIO105 = 0;
-        GpioCtrlRegs.GPDMUX1.bit.GPIO105 = 1;
+        // Configure GPIO40 as SDA_B
+        GpioCtrlRegs.GPBGMUX1.bit.GPIO40 = 1;
+        GpioCtrlRegs.GPBMUX1.bit.GPIO40 = 2;
+
+        // Configure GPIO41 SCL_B
+        GpioCtrlRegs.GPBGMUX1.bit.GPIO41 = 1;
+        GpioCtrlRegs.GPBMUX1.bit.GPIO41 = 2;
 
         // Enable internal pull-up resistors
-        GpioCtrlRegs.GPDPUD.bit.GPIO104 = 0;    // Enable pull-up for SDA
-        GpioCtrlRegs.GPDPUD.bit.GPIO105 = 0;    // Enable pull-up for SCL
+        GpioCtrlRegs.GPBPUD.bit.GPIO40 = 0;    // Enable pull-up for SDA
+        GpioCtrlRegs.GPBPUD.bit.GPIO41 = 0;    // Enable pull-up for SCL
 
         // Set qualification for I2C pins (asynchronous input)
-        GpioCtrlRegs.GPDQSEL1.bit.GPIO104 = 3;
-        GpioCtrlRegs.GPDQSEL1.bit.GPIO105 = 3;
+        GpioCtrlRegs.GPBQSEL1.bit.GPIO40 = 3;
+        GpioCtrlRegs.GPBQSEL1.bit.GPIO41 = 3;
 
-        // Enable I2C_A peripheral clock
-        CpuSysRegs.PCLKCR9.bit.I2C_A = 1;
+        // Enable I2C_B peripheral clock
+        CpuSysRegs.PCLKCR9.bit.I2C_B = 1;
 
     EDIS;
 
     // I2C Module Configuration
     // Set prescaler for 7-12MHz module clock
-    I2caRegs.I2CPSC.all = 6;                    // (200MHz / (6+1)) = ~28.6MHz, need to reduce further
+    I2cbRegs.I2CPSC.all = 6;                    // (200MHz / (6+1)) = ~28.6MHz, need to reduce further
 
     // Set clock dividers for ~100kHz I2C clock
     // I2C_CLK = Module_CLK / ((CLKL + d) + (CLKH + d)) where d=5 for prescaler >= 1
-    I2caRegs.I2CCLKL = 10;                      // Low period
-    I2caRegs.I2CCLKH = 5;                       // High period
+    I2cbRegs.I2CCLKL = 10;                      // Low period
+    I2cbRegs.I2CCLKH = 5;                       // High period
 
     // Disable all interrupts initially
-    I2caRegs.I2CIER.all = 0x0000;
+    I2cbRegs.I2CIER.all = 0x0000;
 
     // Configure I2C mode register
-    I2caRegs.I2CMDR.all = 0x0020;               // Take I2C out of reset, free run mode
+    I2cbRegs.I2CMDR.all = 0x0020;               // Take I2C out of reset, free run mode
 
     // Configure FIFO
-    I2caRegs.I2CFFTX.all = 0x6000;              // Enable FIFO mode and TXFIFO
-    I2caRegs.I2CFFRX.all = 0x2040;              // Enable RXFIFO, clear RXFFINT
+    I2cbRegs.I2CFFTX.all = 0x6000;              // Enable FIFO mode and TXFIFO
+    I2cbRegs.I2CFFRX.all = 0x2040;              // Enable RXFIFO, clear RXFFINT
 
     i2c_status = ds3231_init_and_set_zero();
 
@@ -283,7 +292,7 @@ void i2c_init(void) {
     if (i2c_status == I2C_SUCCESS)
         return;
     else
-        asm("ESTOP0");
+        asm(" ESTOP0");
 }
 
 /**
@@ -315,9 +324,9 @@ void peripheral_Setup(void) {
     adc_init();
     pwm_init();
     watchdog_init();
-    //  dac_init();
+    dac_init();
     uart_init();
-    //  spi_init();
+    spi_init();
     i2c_init();
     interrupt_init();
 

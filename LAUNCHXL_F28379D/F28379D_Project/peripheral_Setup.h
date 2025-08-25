@@ -165,16 +165,15 @@
      * @param data Character to send
      */
     inline void uart_send_char(char data) {
-        while (!ScibRegs.SCICTL2.bit.TXRDY);
-        ScibRegs.SCITXBUF.all = data;
+        while (!ScicRegs.SCICTL2.bit.TXRDY);
+        ScicRegs.SCITXBUF.all = data;
 
         return;
     }
 
     inline void uart_send_string(const char *str) {
-        while (*str) {
+        while (*str)
             uart_send_char(*str++);
-        }
 
         return;
     }
@@ -205,7 +204,7 @@
         Uint32 timeout = 10000;
 
         // Wait until STP bit is cleared
-        while (I2caRegs.I2CMDR.bit.STP == 1 && timeout > 0) {
+        while (I2cbRegs.I2CMDR.bit.STP == 1 && timeout > 0) {
             timeout--;
             DELAY_US(1);
         }
@@ -214,7 +213,7 @@
             return I2C_STP_NOT_READY_ERROR;
 
         // Check if bus is busy
-        if (I2caRegs.I2CSTR.bit.BB == 1)
+        if (I2cbRegs.I2CSTR.bit.BB == 1)
             return I2C_BUS_BUSY_ERROR;
 
         return I2C_SUCCESS;
@@ -239,24 +238,25 @@
             return status;
 
         // Set slave address
-        I2caRegs.I2CSAR.all = DS3231_I2C_ADDR;
+        I2cbRegs.I2CSAR.all = DS3231_I2C_ADDR;
 
         // Set number of bytes to send (register address + data)
-        I2caRegs.I2CCNT = 2;
+        I2cbRegs.I2CCNT = 2;
 
         // Load data into transmit register
-        I2caRegs.I2CDXR.all = reg_addr;   // Register address
-        I2caRegs.I2CDXR.all = data;       // Data
+        I2cbRegs.I2CDXR.all = reg_addr;   // Register address
+        I2cbRegs.I2CDXR.all = data;       // Data
 
         // Start transmission (Master, Transmit, Start, Stop)
-        I2caRegs.I2CMDR.all = 0x6E20;
+        I2cbRegs.I2CMDR.all = 0x6E20;
 
         // Wait for stop condition to be detected
-        while (I2caRegs.I2CSTR.bit.SCD == 0 && timeout > 0) {
+        while (I2cbRegs.I2CSTR.bit.SCD == 0 && timeout > 0) {
             // Check for NACK
-            if (I2caRegs.I2CSTR.bit.NACK == 1) {
-                I2caRegs.I2CSTR.all = I2caRegs.I2CSTR.all; // Clear NACK
-                I2caRegs.I2CMDR.bit.STP = 1;               // Generate stop
+            if (I2cbRegs.I2CSTR.bit.NACK == 1) {
+                I2cbRegs.I2CSTR.all = I2cbRegs.I2CSTR.all; // Clear NACK
+                I2cbRegs.I2CMDR.bit.STP = 1;               // Generate stop
+
                 return I2C_NACK_ERROR;
             }
 
@@ -268,7 +268,7 @@
             return I2C_TIMEOUT_ERROR;
 
         // Clear stop condition detected flag
-        I2caRegs.I2CSTR.bit.SCD = 1;
+        I2cbRegs.I2CSTR.bit.SCD = 1;
 
         return I2C_SUCCESS;
     }
@@ -288,19 +288,20 @@
         if (status != I2C_SUCCESS)
             return status;
 
-        I2caRegs.I2CSAR.all = DS3231_I2C_ADDR;
-        I2caRegs.I2CCNT = 1;
-        I2caRegs.I2CDXR.all = reg_addr;
+        I2cbRegs.I2CSAR.all = DS3231_I2C_ADDR;
+        I2cbRegs.I2CCNT = 1;
+        I2cbRegs.I2CDXR.all = reg_addr;
 
         // Start transmission without stop condition
-        I2caRegs.I2CMDR.all = 0x2620;
+        I2cbRegs.I2CMDR.all = 0x2620;
 
         // Wait for ARDY (address ready)
         timeout = 10000;
-        while (I2caRegs.I2CSTR.bit.ARDY == 0 && timeout > 0) {
-            if (I2caRegs.I2CSTR.bit.NACK == 1) {
-                I2caRegs.I2CSTR.all = I2caRegs.I2CSTR.all;
-                I2caRegs.I2CMDR.bit.STP = 1;
+        while (I2cbRegs.I2CSTR.bit.ARDY == 0 && timeout > 0) {
+            if (I2cbRegs.I2CSTR.bit.NACK == 1) {
+                I2cbRegs.I2CSTR.all = I2cbRegs.I2CSTR.all;
+                I2cbRegs.I2CMDR.bit.STP = 1;
+
                 return I2C_NACK_ERROR;
             }
 
@@ -312,15 +313,15 @@
             return I2C_TIMEOUT_ERROR;
 
         // Clear ARDY flag
-        I2caRegs.I2CSTR.bit.ARDY = 1;
+        I2cbRegs.I2CSTR.bit.ARDY = 1;
 
         // Now read the data with restart condition
-        I2caRegs.I2CCNT = 1;
-        I2caRegs.I2CMDR.all = 0x2C20; // Restart as master receiver with stop
+        I2cbRegs.I2CCNT = 1;
+        I2cbRegs.I2CMDR.all = 0x2C20; // Restart as master receiver with stop
 
         // Wait for stop condition
         timeout = 10000;
-        while (I2caRegs.I2CSTR.bit.SCD == 0 && timeout > 0) {
+        while (I2cbRegs.I2CSTR.bit.SCD == 0 && timeout > 0) {
             timeout--;
             DELAY_US(1);
         }
@@ -329,10 +330,10 @@
             return I2C_TIMEOUT_ERROR;
 
         // Read received data
-        *data = I2caRegs.I2CDRR.all;
+        *data = I2cbRegs.I2CDRR.all;
 
         // Clear stop condition detected flag
-        I2caRegs.I2CSTR.bit.SCD = 1;
+        I2cbRegs.I2CSTR.bit.SCD = 1;
 
         return I2C_SUCCESS;
     }

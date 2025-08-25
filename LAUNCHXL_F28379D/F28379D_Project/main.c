@@ -29,11 +29,11 @@
  *        and starts the FreeRTOS scheduler.
  */
 void main(void) {
-    // Initialize all peripheral systems
-    peripheral_Setup();
-
     // Initialize the selected controller
     controller_init(CONTROLLER);
+
+    // Initialize all peripheral systems
+    peripheral_Setup();
 
     // Start freeRTOS tasks
     freeRTOS_Setup();

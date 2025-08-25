@@ -6,6 +6,7 @@
  */
 
 #include "controllers.h"
+#include "Libraries/Common/F2837xD_Examples.h"
 
 // Global controller instances
 NeuralNetwork neural_network;
@@ -24,6 +25,8 @@ void controller_init(uint8_t controller_type) {
         neural_network_init();
     else if (controller_type == PI_CONTROLLER)
         pi_controller_init();
+
+    DELAY_US(1000);
 
     return;
 }
@@ -53,6 +56,8 @@ void controller_reset(void) {
         neural_network_reset();
     else
         pi_controller_reset();
+
+    DELAY_US(1000);
 
     return;
 }
