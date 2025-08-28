@@ -35,7 +35,7 @@ This research project demonstrates the integration of:
 ## Hardware Components
 
 <p align = "middle">
-  <img src = "res/circuit.jpeg" alt = "Circuit" width = "1280" height = "720"/>
+  <img src = "res/circuit.jpeg" alt = "Circuit" width = "640" height = "360"/>
 </p>
 
 ### F28379D LaunchPad Controller
