@@ -1,0 +1,19 @@
+[package]
+name = "full_project"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+# LCD Display
+lcd_display = "0.1.0"
+
+# UART
+serialport = "4.2"
+
+# Web-server
+tokio = {version = "1.47.1", features = ["full"]}
+rusqlite = {version = "0.37.0", features = ["bundled"]}
+
+axum = "0.8.4"
+chrono = "0.4.41"
