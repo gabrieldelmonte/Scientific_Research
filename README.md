@@ -34,6 +34,10 @@ This research project demonstrates the integration of:
 
 ## Hardware Components
 
+<p align = "middle">
+  <img src = "res/circuit.jpeg" alt = "Circuit" width = "1280" height = "720"/>
+</p>
+
 ### F28379D LaunchPad Controller
 - **TI LAUNCHXL-F28379D** development board
 - **Buck Converter Circuit** with voltage/current sensing
@@ -50,9 +54,9 @@ This research project demonstrates the integration of:
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
-### 🎮 [LAUNCHXL_F28379D](./LAUNCHXL_F28379D/) - Buck Converter Controller
+### [LAUNCHXL_F28379D](./LAUNCHXL_F28379D/) - Buck Converter Controller
 
 The F28379D project implements a sophisticated buck converter control system with dual controller architectures and comprehensive monitoring capabilities.
 
@@ -212,6 +216,10 @@ cargo run
 2. **Power On**: Start F28379D controller first
 3. **Launch Monitor**: Run BeagleBone application
 4. **Access Web Interface**: `http://<beaglebone_ip>:38534`
+
+<p align = "middle">
+  <img src = "res/web_server.png" alt = "WebServer" width = "1280" height = "720"/>
+</p>
 
 ---
 
