@@ -21,10 +21,17 @@ uint8_t current_controller_type = PI_CONTROLLER;
 void controller_init(uint8_t controller_type) {
     current_controller_type = controller_type;
 
-    if (controller_type == NNA_CONTROLLER)
-        neural_network_init();
-    else if (controller_type == PI_CONTROLLER)
-        pi_controller_init();
+    switch (controller_type) {
+        case PI_CONTROLLER:
+            pi_controller_init();
+            break;
+        case NNA_CONTROLLER:
+            neural_network_init();
+            break;
+        default:
+            asm(" ESTOP0");
+            break;
+    }
 
     DELAY_US(1000);
 
@@ -92,7 +99,7 @@ float pi_controller_compute(float setpoint, float measured_voltage) {
     pi_controller.error = (setpoint - measured_voltage);
 
     pi_controller.output =
-        (pi_controller.error * pi_controller.b0) +
+        (pi_controller.error * pi_controller.b0)     +
         (pi_controller.error_old * pi_controller.b1) -
         (pi_controller.output_old * pi_controller.a1);
 
@@ -171,7 +178,7 @@ float neural_network_compute(float setpoint, float measured_voltage, float measu
     // Prepare inputs
     inputs[0] = BIAS;
     inputs[1] = (2.0f * measured_voltage / MAX_VOLTAGE) - 1.0f;
-    inputs[2] = (measured_current / MAX_CURRENT_mA) * 2.0f - 1.0f;
+    inputs[2] = (2.0f * measured_current / MAX_CURRENT_mA) - 1.0f;
 
     if (inputs[2] < -1.0f)
         inputs[2] = -1.0f;
