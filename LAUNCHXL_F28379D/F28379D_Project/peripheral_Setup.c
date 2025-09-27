@@ -140,8 +140,8 @@ void adc_init(void) {
 void pwm_init(void) {
     StartEPWMConfig();
 
-    ConfigEPwm_REF(EPWM1, ePWM_HSPCLKDIV_1, ePWM_CLKDIV_1, 20000);
-    pwm_factor = DutyCycle(ePWM_HSPCLKDIV_1, ePWM_CLKDIV_1, 20000);
+    ConfigEPwm_REF(EPWM1, ePWM_HSPCLKDIV_1, ePWM_CLKDIV_1, 80000);
+    pwm_factor = DutyCycle(ePWM_HSPCLKDIV_1, ePWM_CLKDIV_1, 80000);
 
     ConfigSyncPWMs();
     InitEPwmGpio();
@@ -158,7 +158,7 @@ void pwm_init(void) {
 void watchdog_init(void) {
     ConfigWatchdog(RESET);
     ServiceDog();
-    EnableWatchdog(WD_PS_1);
+    EnableWatchdog(WD_PS_64);
 
     return;
 }
@@ -309,7 +309,7 @@ void interrupt_init(void) {
     EDIS;
 
     InitCpuTimers();
-    ConfigCpuTimer(&CpuTimer0, 100, 50);
+    ConfigCpuTimer(&CpuTimer0, 200, 50000);
     ConfigInterrupt(int_vectors);
     StartCpuTimer0();
 
